@@ -109,6 +109,101 @@ export const usePalStore = defineStore('pal', () => {
     return `/img/pals/T_${code}_icon_normal.webp`
   }
 
+
+
+  // ============================================================
+  // 属性 / 工作适性 中英映射
+  // ============================================================
+  const ELEMENT_CN = {
+    Normal: '无属性',
+    Leaf: '草',
+    Fire: '火',
+    Water: '水',
+    Electricity: '电',
+    Earth: '地',
+    Ice: '冰',
+    Dark: '暗',
+    Dragon: '龙',
+    Neutral: '无属性',
+  }
+
+  // 技能属性词表（和帕鲁属性词表不完全一样）
+  const SKILL_ELEMENT_CN = {
+    Normal: '无属性',
+    Neutral: '无属性',
+    Leaf: '草',
+    Grass: '草',
+    Fire: '火',
+    Water: '水',
+    Electricity: '电',
+    Electric: '电',
+    Earth: '地',
+    Ground: '地',
+    Ice: '冰',
+    Dark: '暗',
+    Dragon: '龙',
+  }
+
+  function skillElementCn(key) {
+    return SKILL_ELEMENT_CN[key] || ELEMENT_CN[key] || key
+  }
+
+  // 属性显示顺序（图鉴筛选栏用）
+  const ELEMENT_ORDER = [
+    'Normal', 'Fire', 'Water', 'Leaf', 'Electricity',
+    'Earth', 'Ice', 'Dark', 'Dragon',
+  ]
+
+  const WORK_CN = {
+    Kindling: '点火',
+    Watering: '浇水',
+    Planting: '播种',
+    GenerateElectricity: '发电',
+    Handiwork: '手工',
+    Gathering: '采集',
+    Lumbering: '伐木',
+    Mining: '挖矿',
+    MedicineProduction: '制药',
+    Cooling: '冷却',
+    Transporting: '搬运',
+    Farming: '牧场',
+  }
+
+  // 工作显示顺序
+  const WORK_ORDER = [
+    'Kindling', 'Watering', 'Planting', 'GenerateElectricity',
+    'Handiwork', 'Gathering', 'Lumbering', 'Mining',
+    'MedicineProduction', 'Cooling', 'Transporting', 'Farming',
+  ]
+
+  // 便捷查询函数
+  function elementCn(key) {
+    return ELEMENT_CN[key] || key
+  }
+
+  function workCn(key) {
+    return WORK_CN[key] || key
+  }
+
+  // 当前数据里出现过的属性（按 ELEMENT_ORDER 排）
+  const availableElements = computed(() => {
+    const s = new Set()
+    for (const p of pals.value) {
+      for (const e of p.element || []) s.add(e)
+    }
+    return ELEMENT_ORDER.filter(e => s.has(e))
+  })
+
+  // 当前数据里出现过的工作适性（按 WORK_ORDER 排）
+  const availableWorks = computed(() => {
+    const s = new Set()
+    for (const p of pals.value) {
+      for (const w of p.workSuitability || []) s.add(w.work)
+    }
+    return WORK_ORDER.filter(w => s.has(w))
+  })
+
+
   return {
     // state
     dataset, cnNameMap, loading, error, loaded,
@@ -118,5 +213,9 @@ export const usePalStore = defineStore('pal', () => {
     engine,
     // actions
     load, resolvePal, cnOf, iconUrl,
+    // 映射
+    ELEMENT_CN, ELEMENT_ORDER, WORK_CN, WORK_ORDER,
+    elementCn, workCn, availableElements, availableWorks,
+    skillElementCn,
   }
 })
